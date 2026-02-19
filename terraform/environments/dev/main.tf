@@ -96,7 +96,7 @@ module "infoblox_dns" {
     }
     "grafana" = {
       type    = "A"
-      address = "172.20.10.21"
+      address = "172.20.10.99"
       comment = "Grafana dashboard"
     }                                                                                                                 
   }
