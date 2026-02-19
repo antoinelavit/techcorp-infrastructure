@@ -9,10 +9,10 @@
 
   tasks:
     - name: Get next available IP addresses for new app instances
-      infoblox.universal_ddi.ipam_next_available_address:
+      infoblox.universal_ddi.ipam_next_available_ip_info:
         portal_url: "{{ portal_url }}"
         portal_key: "{{ portal_key }}"
-        subnet_id: "{{ app_subnet_id }}"
+        id: "{{ app_subnet_id }}"
         count: 3
       register: allocated_ips
 
@@ -20,7 +20,7 @@
       debug:
         msg: |
           Universal DDI automatically found these IPs:
-          {{ allocated_ips.addresses | join(', ') }}
+          {{ allocated_ips.objects | join(', ') }}
           No spreadsheets. No collisions. No human error.
 
     - name: Create host records for new servers
@@ -32,21 +32,19 @@
           - address: "{{ item }}"
             space: "{{ ip_space_id }}"
         state: present
-      loop: "{{ allocated_ips.addresses }}"
+      loop: "{{ allocated_ips.objects }}"
       loop_control:
         index_var: idx
 
     - name: Get next available SUBNET for a new project
-      infoblox.universal_ddi.ipam_next_available_subnet:
+      infoblox.universal_ddi.ipam_next_available_subnet_info:
         portal_url: "{{ portal_url }}"
         portal_key: "{{ portal_key }}"
-        address_block_id: "{{ address_block_id }}"
+        id: "{{ address_block_id }}"
         cidr: 24
         count: 1
-        name: "new-project-subnet"
-        comment: "Auto-provisioned for Project Phoenix"
       register: new_subnet
 
     - name: Display new subnet
       debug:
-        msg: "New /24 subnet auto-allocated: {{ new_subnet.subnets[0].address }}/24"
+        msg: "New /24 subnet auto-allocated: {{ new_subnet.objects[0] }}"
