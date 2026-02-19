@@ -31,7 +31,15 @@ echo "=== Step 1: Forking repository ==="
 gh repo fork iracic82/techcorp-infrastructure --clone=false 2>/dev/null || echo "Fork already exists"
 REPO="$GH_USER/techcorp-infrastructure"
 echo "Fork: https://github.com/$REPO"
+echo "Waiting for fork to initialize..."
 sleep 5
+
+# Enable GitHub Actions on the fork (disabled by default on forks)
+echo "Enabling GitHub Actions on fork..."
+gh api -X PUT "repos/$REPO/actions/permissions" \
+  -f enabled=true -f allowed_actions=all 2>/dev/null \
+  && echo "  Actions enabled ✓" \
+  || echo "  Actions may already be enabled"
 
 # Step 2: Set secrets
 echo ""
